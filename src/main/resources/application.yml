@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: survey-hw
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+
+  servlet:
+    multipart:
+      enabled: true
+      resolve-lazily: false
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+logging:
+  level:
+    root: INFO
+
+springdoc:
+  api-docs:
+    version: openapi_3_1
+  packages-to-scan: com.dynata.surveyhw
