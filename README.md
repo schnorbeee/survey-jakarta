@@ -14,9 +14,9 @@ The following guides illustrate how to use some features concretely:
 This project contains a Docker Compose file named `docker-compose.yml`.
 In this file, the following services have been defined:
 
-* db1: [`postgres:16, port: 5432`]
-* pgadmin1: [`dpage/pgadmin4, port: 5050`]
-* backend1: [`main app use Dockerfile, port: 8080`]
+* db3: [`postgres:16, port: 5433`]
+* pgadmin3: [`dpage/pgadmin4, port: 5052`]
+* backend3: [`main app use Dockerfile, port: 8082`]
 
 Please review the tags of the used images and set them to the same as you're running in production.
 
@@ -28,12 +28,12 @@ You can run application with a single command, into the root of project:
 
 Application will running under this link:
 
-http://localhost:8080/
+http://localhost:8082/
 
 You don't need `mvn clean install` or `mvn clean install -DskipTests` command to prebuild application,
 but if you want to run test cases, then you have 2 options:
 
-1. You simple run `mvn clean install` into the root of project. In this case all tests will run after the build.
+1. You simple run `mvn clean install -Ptest` into the root of project. In this case all tests will run after the build.
 2. You can run separate run once by once test files with Intellj. You can find files here:
    ../src/test/java/com/dynata/surveyhw/controllers/*
 
@@ -59,13 +59,13 @@ If you want to check the database actual state while running app with docker-com
 then you can use link bellow. You need enter just once root password "admin" and after this, also once database
 password "survey_password".
 
-http://localhost:5050/
+http://localhost:5052/
 
 If you want to test performance POST and GET endpoint, then you can run wrk command into the root folder with terminal
 like this:
 
-`wrk -t5 -c100 -d30s -s sync_requests_GET.lua http://localhost:8080`
+`wrk -t5 -c100 -d30s -s sync_requests_GET.lua http://localhost:8082`
 
-`wrk -t5 -c100 -d30s -s sync_requests_POST.lua http://localhost:8080`
+`wrk -t5 -c100 -d30s -s sync_requests_POST.lua http://localhost:8082`
 
 I hope it will be fine.

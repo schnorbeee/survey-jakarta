@@ -1,0 +1,9 @@
+embed-server --std-out=echo --server-config=standalone.xml
+
+# PostgreSQL driver telepítése
+/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver)
+
+# Datasource létrehozása
+data-source add --name=SurveyDS --jndi-name=java:/jdbc/SurveyDS --driver-name=postgresql --connection-url=jdbc:postgresql://db3:5432/survey_db --user-name=survey_user --password=survey_password --check-valid-connection-sql="SELECT 1" --enabled=true
+
+stop-embedded-server

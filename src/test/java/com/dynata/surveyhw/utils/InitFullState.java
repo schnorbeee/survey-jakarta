@@ -19,39 +19,38 @@ import com.dynata.surveyhw.repositories.SurveyRepository;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
-@Component
+@Stateless
 public class InitFullState {
 
-    @Autowired
+    @EJB
     private MemberRepository memberRepository;
 
-    @Autowired
+    @EJB
     private StatusRepository statusRepository;
 
-    @Autowired
+    @EJB
     private SurveyRepository surveyRepository;
 
-    @Autowired
+    @EJB
     private ParticipationRepository participationRepository;
 
-    @Autowired
+    @Inject
     private StatusMapper statusMapper;
 
-    @Autowired
+    @Inject
     private MemberMapper memberMapper;
 
-    @Autowired
+    @Inject
     private SurveyMapper surveyMapper;
 
-    @Autowired
+    @Inject
     private ParticipationMapper participationMapper;
 
     public void deleteFullDatabase() {
@@ -62,28 +61,28 @@ public class InitFullState {
     }
 
     public void initAllCsv(boolean exceptParticipation) {
-        List<Status> statuses = readFromCsv(new File("src/test/resources/testfiles/Statuses.csv"),
+        List<Status> statuses = readFromCsv(getClass().getClassLoader().getResourceAsStream("testfiles/Statuses.csv"),
                 StatusCsvDto.class).stream().map(statusMapper::toEntity).toList();
         statusRepository.saveAll(statuses);
 
-        List<Member> memners = readFromCsv(new File("src/test/resources/testfiles/Members.csv"),
+        List<Member> members = readFromCsv(getClass().getClassLoader().getResourceAsStream("testfiles/Members.csv"),
                 MemberCsvDto.class).stream().map(memberMapper::toEntity).toList();
-        memberRepository.saveAll(memners);
+        memberRepository.saveAll(members);
 
-        List<Survey> surveys = readFromCsv(new File("src/test/resources/testfiles/Surveys.csv"),
+        List<Survey> surveys = readFromCsv(getClass().getClassLoader().getResourceAsStream("testfiles/Surveys.csv"),
                 SurveyCsvDto.class).stream().map(surveyMapper::toEntity).toList();
         surveyRepository.saveAll(surveys);
 
         if (!exceptParticipation) {
             List<Participation> participations = readFromCsv(
-                    new File("src/test/resources/testfiles/Participations.csv"),
+                    getClass().getClassLoader().getResourceAsStream("testfiles/Participations.csv"),
                     ParticipationCsvDto.class).stream().map(participationMapper::toEntity).toList();
             participationRepository.saveAll(participations);
         }
     }
 
-    private <T> List<T> readFromCsv(File file, Class<T> clazz) {
-        try (InputStream inputStream = new FileInputStream(file)) {
+    private <T> List<T> readFromCsv(InputStream file, Class<T> clazz) {
+        try (InputStream inputStream = file) {
             CsvMapper mapper = new CsvMapper();
             CsvSchema schema = CsvSchema.emptySchema().withHeader();
             MappingIterator<T> iterator = mapper.readerFor(clazz)

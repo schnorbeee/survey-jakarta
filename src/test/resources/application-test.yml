@@ -1,6 +1,17 @@
-spring:
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql
-      platform: postgres
+jakarta:
+  datasource:
+    url: jdbc:postgresql://db:5432/testdb
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  servlet:
+    multipart:
+      enabled: true
+      resolve-lazily: false
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+logging:
+  level:
+    root: INFO

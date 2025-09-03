@@ -1,36 +1,32 @@
 package com.dynata.surveyhw.services;
 
 import com.dynata.surveyhw.dtos.PageDto;
+import com.dynata.surveyhw.dtos.PageRequest;
 import com.dynata.surveyhw.dtos.SurveyDto;
 import com.dynata.surveyhw.dtos.SurveyStatisticDto;
 import com.dynata.surveyhw.dtos.csv.SurveyCsvDto;
 import com.dynata.surveyhw.mappers.PageMapper;
 import com.dynata.surveyhw.mappers.SurveyMapper;
 import com.dynata.surveyhw.repositories.SurveyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
+@Stateless
 public class SurveyService {
 
-    private final SurveyRepository surveyRepository;
+    @EJB
+    private SurveyRepository surveyRepository;
 
-    private final SurveyMapper surveyMapper;
+    @Inject
+    private SurveyMapper surveyMapper;
 
-    private final PageMapper pageMapper;
-
-    @Autowired
-    public SurveyService(SurveyRepository surveyRepository,
-            SurveyMapper surveyMapper, PageMapper pageMapper) {
-        this.surveyRepository = surveyRepository;
-        this.surveyMapper = surveyMapper;
-        this.pageMapper = pageMapper;
-    }
+    @Inject
+    private PageMapper pageMapper;
 
     public List<SurveyDto> saveSurveyDtos(List<SurveyCsvDto> surveyDtos) {
         return surveyDtos.stream()
@@ -40,7 +36,7 @@ public class SurveyService {
                 .toList();
     }
 
-    public PageDto<SurveyDto> getByMemberIdAndIsCompleted(Long memberId, Pageable pageable) {
+    public PageDto<SurveyDto> getByMemberIdAndIsCompleted(Long memberId, PageRequest pageable) {
         return pageMapper.surveyDtos(surveyRepository.findByMemberIdAndIsCompleted(memberId, pageable));
     }
 
@@ -51,7 +47,7 @@ public class SurveyService {
         return surveyCompletionPoints;
     }
 
-    public PageDto<SurveyStatisticDto> getAllStatisticSurveys(Pageable pageable) {
+    public PageDto<SurveyStatisticDto> getAllStatisticSurveys(PageRequest pageable) {
         return surveyRepository.getAllStatisticSurveys(pageable);
     }
 }

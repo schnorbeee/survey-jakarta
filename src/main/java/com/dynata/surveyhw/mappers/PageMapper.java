@@ -7,9 +7,11 @@ import com.dynata.surveyhw.entities.Member;
 import com.dynata.surveyhw.entities.Survey;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = "spring", uses = {
-        MemberMapper.class, SurveyMapper.class, StatusMapper.class, ParticipationMapper.class
+
+@Mapper(componentModel = MappingConstants.ComponentModel.JAKARTA_CDI, uses = {
+        MemberMapper.class, SurveyMapper.class
 })
 public interface PageMapper {
 

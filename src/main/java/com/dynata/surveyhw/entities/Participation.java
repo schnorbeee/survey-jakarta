@@ -1,5 +1,6 @@
 package com.dynata.surveyhw.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,38 +14,34 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "participation",
-        uniqueConstraints = @UniqueConstraint(columnNames = { "memberId", "surveyId", "statusId" })
+        uniqueConstraints = @UniqueConstraint(columnNames = { "member_id", "survey_id", "status_id" })
 )
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class Participation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long memberId;
-
-    private Long surveyId;
-
-    private Long statusId;
-
-    private Integer length;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId", referencedColumnName = "member_id", insertable = false, updatable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "surveyId", referencedColumnName = "survey_id", insertable = false, updatable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "survey_id", referencedColumnName = "survey_id", nullable = false)
     private Survey survey;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "statusId", referencedColumnName = "status_id", insertable = false, updatable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "status_id", referencedColumnName = "status_id", nullable = false)
     private Status status;
+
+    private Integer length;
 }

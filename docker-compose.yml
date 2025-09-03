@@ -1,5 +1,5 @@
 services:
-  db1:
+  db3:
     image: postgres:16
     restart: always
     environment:
@@ -8,10 +8,13 @@ services:
       POSTGRES_PASSWORD: survey_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
     ports:
-      - "5432:5432"
+      - "5433:5432"
+    networks:
+      - survey-net
 
-  pgadmin1:
+  pgadmin3:
     image: dpage/pgadmin4
     restart: always
     environment:
@@ -23,25 +26,41 @@ services:
       - ./pgadmin/servers.json:/pgadmin4/servers.json
       - ./pgadmin/.pgpass:/pgpass
     ports:
-      - "5050:80"
+      - "5052:80"
+    networks:
+      - survey-net
     depends_on:
-      - db1
+      - db3
 
-  backend1:
+  backend3:
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - db1
+    restart: always
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db1:5432/survey_db
-      SPRING_DATASOURCE_USERNAME: survey_user
-      SPRING_DATASOURCE_PASSWORD: survey_password
-      SPRING_PROFILES_ACTIVE: docker
+      - JAVA_OPTS=-Duser.timezone=Europe/Budapest
+      - JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,address=*:5005,server=y,suspend=n
     ports:
-      - "8080:8080"
-    command: [ "java", "-jar", "/app.jar" ]
+      - "8082:8080"
+      - "5005:5005"
+    networks:
+      - survey-net
+    depends_on:
+      - db3
+
+#  frontend3:
+#    build:
+#      context: ../surveys-frontend
+#      dockerfile: Dockerfile
+#    ports:
+#      - "3002:80"
+#    depends_on:
+#      - backend3
 
 volumes:
   postgres_data:
   pgadmin_data:
+
+networks:
+  survey-net:
+    driver: bridge

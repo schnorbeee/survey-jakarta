@@ -2,52 +2,60 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.4</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
 
     <groupId>com.dynata</groupId>
     <artifactId>survey-hw</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>survey-hw</name>
-    <description>survey-hw</description>
+    <packaging>war</packaging>
+    <name>survey-hw-jakarta</name>
+    <description>survey-hw-jakarta</description>
 
     <properties>
-        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
+        <maven.war.plugin.version>3.4.0</maven.war.plugin.version>
+        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+        <dockerfile.maven.plugin.version>1.4.13</dockerfile.maven.plugin.version>
+        <jakarta.version>10.0.0</jakarta.version>
+        <jakarta.persistence.version>3.1.0</jakarta.persistence.version>
+        <jakarta.jax-rs.version>3.1.0</jakarta.jax-rs.version>
+        <jakarta.json.bind.version>3.0.1</jakarta.json.bind.version>
+        <lombok.version>1.18.38</lombok.version>
+        <postgresql.version>42.7.7</postgresql.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
+        <jackson.json.version>2.19.2</jackson.json.version>
+        <org.jboss.resteasy.version>3.8.0.Final</org.jboss.resteasy.version>
         <com.opencsv.version>5.9</com.opencsv.version>
-        <org.testcontainers.version>1.19.3</org.testcontainers.version>
-        <org.springdoc.version>2.8.9</org.springdoc.version>
-        <org.springdoc.maven.version>1.5</org.springdoc.maven.version>
+        <org.testcontainers.version>1.20.1</org.testcontainers.version>
+        <mockito.core.version>5.17.0</mockito.core.version>
+        <assertj.core.version>3.27.3</assertj.core.version>
+        <junit.jupiter.engine.version>5.12.2</junit.jupiter.engine.version>
+        <rest.assured.version>5.5.5</rest.assured.version>
         <com.querydsl.version>5.1.0</com.querydsl.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
+
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+            <version>${jakarta.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Databases -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -67,10 +75,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-csv</artifactId>
+            <version>${jackson.json.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.json.version}</version>
         </dependency>
 
         <!-- QueryDSL -->
@@ -91,6 +101,12 @@
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${org.testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
             <version>${org.testcontainers.version}</version>
             <scope>test</scope>
@@ -101,61 +117,120 @@
             <version>${org.testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <version>${mockito.core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <version>${assertj.core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.jupiter.engine.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.jupiter.engine.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.jupiter.engine.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.rest-assured</groupId>
-            <artifactId>spring-mock-mvc</artifactId>
+            <artifactId>rest-assured</artifactId>
+            <version>${rest.assured.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- OpenApi doc generate -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${org.springdoc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
+    <profiles>
+        <!-- Local futtatás -->
+        <profile>
+            <id>local</id>
+            <properties>
+                <env.profile>local</env.profile>
+            </properties>
+        </profile>
+
+        <!-- Docker futtatás -->
+        <profile>
+            <id>docker</id>
+            <properties>
+                <env.profile>docker</env.profile>
+            </properties>
+        </profile>
+
+        <!-- Testcontainers futtatás -->
+        <profile>
+            <id>test</id>
+            <properties>
+                <env.profile>test</env.profile>
+            </properties>
+            <build>
+                <plugins>
+                    <!-- Teszt WAR build -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>${maven.war.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>test-war</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>war</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>tests</classifier>
+                                    <warName>${project.artifactId}-${project.version}</warName>
+                                    <webResources>
+                                        <!-- test classes -->
+                                        <resource>
+                                            <directory>${project.build.testOutputDirectory}</directory>
+                                            <targetPath>WEB-INF/classes</targetPath>
+                                            <includes>
+                                                <include>**/*</include>
+                                            </includes>
+                                        </resource>
+                                        <!-- test resources -->
+                                        <resource>
+                                            <directory>src/test/resources</directory>
+                                            <targetPath>WEB-INF/classes</targetPath>
+                                            <includes>
+                                                <include>**/*</include>
+                                            </includes>
+                                        </resource>
+                                    </webResources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
-            <!-- 1) QueryDSL: külön körben, generate-sources fázisban -->
+            <!-- 1) QueryDSL generálás -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>querydsl-generate</id>
@@ -165,10 +240,9 @@
                         </goals>
                         <configuration>
                             <proc>only</proc>
-                            <source>${java.version}</source>
-                            <target>${java.version}</target>
-                            <generatedSourcesDirectory>
-                                ${project.build.directory}/generated-sources/querydsl
+                            <source>${maven.compiler.release}</source>
+                            <target>${maven.compiler.release}</target>
+                            <generatedSourcesDirectory>${project.build.directory}/generated-sources/querydsl
                             </generatedSourcesDirectory>
                             <annotationProcessorPaths>
                                 <path>
@@ -180,7 +254,7 @@
                                 <path>
                                     <groupId>jakarta.persistence</groupId>
                                     <artifactId>jakarta.persistence-api</artifactId>
-                                    <version>3.1.0</version>
+                                    <version>${jakarta.persistence.version}</version>
                                 </path>
                             </annotationProcessorPaths>
                             <compilerArgs>
@@ -190,7 +264,7 @@
                         </configuration>
                     </execution>
 
-                    <!-- 2) Normál fordítás: Lombok + MapStruct -->
+                    <!-- 2) MapStruct generálás -->
                     <execution>
                         <id>default-compile</id>
                         <phase>compile</phase>
@@ -198,12 +272,15 @@
                             <goal>compile</goal>
                         </goals>
                         <configuration>
-                            <source>${java.version}</source>
-                            <target>${java.version}</target>
+                            <source>${maven.compiler.release}</source>
+                            <target>${maven.compiler.release}</target>
+                            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations
+                            </generatedSourcesDirectory>
                             <annotationProcessorPaths>
                                 <path>
                                     <groupId>org.projectlombok</groupId>
                                     <artifactId>lombok</artifactId>
+                                    <version>${lombok.version}</version>
                                 </path>
                                 <path>
                                     <groupId>org.mapstruct</groupId>
@@ -216,75 +293,30 @@
                 </executions>
             </plugin>
 
-            <!-- A generált mappa hozzáadása a forrásokhoz (stabilitás kedvéért is marad) -->
-            <!--            <plugin>-->
-            <!--                <groupId>org.codehaus.mojo</groupId>-->
-            <!--                <artifactId>build-helper-maven-plugin</artifactId>-->
-            <!--                <version>3.6.0</version>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <id>add-source</id>-->
-            <!--                        <phase>generate-sources</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>add-source</goal>-->
-            <!--                        </goals>-->
-            <!--                        <configuration>-->
-            <!--                            <sources>-->
-            <!--                                <source>${project.build.directory}/generated-sources/querydsl</source>-->
-            <!--                            </sources>-->
-            <!--                        </configuration>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
-
-            <!-- Spring Boot indítás/leállítás az OpenAPI generáláshoz -->
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven.war.plugin.version}</version>
                 <executions>
+                    <!-- normál build -->
                     <execution>
-                        <id>pre-integration-test</id>
+                        <id>default-war</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>start</goal>
+                            <goal>war</goal>
                         </goals>
-                    </execution>
-                    <execution>
-                        <id>post-integration-test</id>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
+                        <configuration>
+                            <warName>${project.artifactId}-${project.version}</warName>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- springdoc OpenAPI yaml generálás -->
+            <!-- 6) Surefire plugin JUnit5 -->
             <plugin>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-maven-plugin</artifactId>
-                <version>${org.springdoc.maven.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-openapi</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <apiDocsUrl>http://localhost:8080/v3/api-docs.yaml</apiDocsUrl>
-                            <outputDir>${project.basedir}/openapi-doc</outputDir>
-                            <outputFileName>survey-openapi.yaml</outputFileName>
-                            <attachArtifact>false</attachArtifact>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
             </plugin>
         </plugins>
     </build>

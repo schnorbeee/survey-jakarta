@@ -1,5 +1,6 @@
-spring:
+jakarta:
   datasource:
-    url: jdbc:postgresql://localhost:5432/survey_db
+    url: jdbc:postgresql://localhost:5433/survey_db
     username: survey_user
     password: survey_password
+    driver-class-name: org.postgresql.Driver

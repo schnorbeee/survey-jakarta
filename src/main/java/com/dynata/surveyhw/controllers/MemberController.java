@@ -1,109 +1,63 @@
 package com.dynata.surveyhw.controllers;
 
-import com.dynata.surveyhw.dtos.MemberDto;
-import com.dynata.surveyhw.dtos.PageDto;
+import com.dynata.surveyhw.dtos.PageRequest;
 import com.dynata.surveyhw.dtos.csv.MemberCsvDto;
-import com.dynata.surveyhw.dtos.openapi.PageMemberDto;
-import com.dynata.surveyhw.handlers.responses.ExceptionResponse;
 import com.dynata.surveyhw.services.CsvService;
 import com.dynata.surveyhw.services.MemberService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+import jakarta.ejb.EJB;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
+import java.io.InputStream;
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/members")
+@RequestScoped
+@Path("/members")
 public class MemberController {
 
-    private final CsvService csvService;
+    @EJB
+    private CsvService csvService;
 
-    private final MemberService memberService;
+    @EJB
+    private MemberService memberService;
 
-    @Autowired(required = false)
-    public MemberController(CsvService csvService, MemberService memberService) {
-        this.csvService = csvService;
-        this.memberService = memberService;
-    }
-
-    @Operation(summary = "Save members from csv file.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "CREATED",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(implementation = MemberDto.class)))),
-            @ApiResponse(responseCode = "400", description = "Runtime error: HttpStatus.BAD_REQUEST",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ExceptionResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Fatal error: HttpStatus.INTERNAL_SERVER_ERROR",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<MemberDto>> uploadMembersCsv(@RequestParam("file") MultipartFile file) {
+    @POST
+    @Consumes(value = MediaType.MULTIPART_FORM_DATA)
+    @Produces(value = MediaType.APPLICATION_JSON)
+    public Response uploadMembersCsv(@FormParam("file") InputStream file) {
         List<MemberCsvDto> memberDtos = csvService.readFromCsv(file, MemberCsvDto.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.saveMemberDtos(memberDtos));
+        return Response.ok(memberService.saveMemberDtos(memberDtos))
+                .status(Response.Status.CREATED)
+                .build();
     }
 
-    @Operation(summary = "Get member list by surveyId, and status is: Completed")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = PageMemberDto.class),
-                            examples = @ExampleObject(name = "PageMemberDtoExample",
-                                    summary = "Paged response with MemberDto objects",
-                                    externalValue = "/openapi/examples/page-member-example.json"
-                            ))),
-            @ApiResponse(responseCode = "400", description = "Runtime error: HttpStatus.BAD_REQUEST",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ExceptionResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Fatal error: HttpStatus.INTERNAL_SERVER_ERROR",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @GetMapping(path = "/by-survey-and-completed", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PageDto<MemberDto>> getBySurveyIdAndIsCompleted(@RequestParam("surveyId") Long surveyId,
-            @ParameterObject @PageableDefault(size = 20, sort = "memberId") Pageable pageable) {
-        return ResponseEntity.ok(memberService.getBySurveyIdAndIsCompleted(surveyId, pageable));
+    @GET
+    @Path("/by-survey-and-completed")
+    @Produces(value = MediaType.APPLICATION_JSON)
+    public Response getBySurveyIdAndIsCompleted(@QueryParam("surveyId") Long surveyId,
+            @BeanParam PageRequest pageable) {
+        return Response.ok(memberService.getBySurveyIdAndIsCompleted(surveyId, pageable))
+                .status(Response.Status.OK)
+                .build();
     }
 
-    @Operation(summary = "Get member list by surveyId, and status is: Rejected or Not asked")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = PageMemberDto.class),
-                            examples = @ExampleObject(name = "PageMemberDtoExample",
-                                    summary = "Paged response with MemberDto objects",
-                                    externalValue = "/openapi/examples/page-member-example.json"
-                            ))),
-            @ApiResponse(responseCode = "400", description = "Runtime error: HttpStatus.BAD_REQUEST",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ExceptionResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Fatal error: HttpStatus.INTERNAL_SERVER_ERROR",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ExceptionResponse.class)))
-    })
-    @GetMapping(path = "/by-not-participated-survey-and-active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PageDto<MemberDto>> getByNotParticipatedInSurveyAndIsActive(
-            @RequestParam("surveyId") Long surveyId,
-            @ParameterObject @PageableDefault(size = 20, sort = "memberId") Pageable pageable) {
-        return ResponseEntity.ok(memberService.getByNotParticipatedInSurveyAndIsActive(surveyId, pageable));
+    @GET
+    @Path("/by-not-participated-survey-and-active")
+    @Produces(value = MediaType.APPLICATION_JSON)
+    public Response getByNotParticipatedInSurveyAndIsActive(
+            @QueryParam("surveyId") Long surveyId,
+            @BeanParam PageRequest pageable) {
+        return Response.ok(memberService.getByNotParticipatedInSurveyAndIsActive(surveyId, pageable))
+                .status(Response.Status.OK)
+                .build();
     }
 }

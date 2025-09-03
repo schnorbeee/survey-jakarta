@@ -2,31 +2,37 @@ package com.dynata.surveyhw.utils;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.Expressions;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import com.querydsl.core.types.dsl.PathBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class QuerySortUtils {
 
-    public static <T> List<OrderSpecifier<?>> toOrderSpecifiers(Pageable pageable, Class<T> clazz) {
+    /**
+     * Létrehoz egy listát OrderSpecifier-ekből.
+     *
+     * @param sortMap rendezési mezők és irányuk (true = ascending, false = descending)
+     * @param clazz   az entitás osztálya
+     * @param <T>     entitás típusa
+     * @return lista OrderSpecifier-ekből
+     */
+    public static <T> List<OrderSpecifier<?>> toOrderSpecifiers(Map<String, Order> sortMap, Class<T> clazz) {
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
 
-        if (pageable == null || pageable.getSort().isUnsorted()) {
+        if (sortMap == null || sortMap.isEmpty()) {
             return orderSpecifiers;
         }
 
-        for (Sort.Order order : pageable.getSort()) {
-            Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+        PathBuilder<T> entityPath = new PathBuilder<>(clazz, clazz.getSimpleName().toLowerCase());
 
-            // itt adunk típusparamétert: <Comparable>
-            OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(direction,
-                    Expressions.path(Comparable.class, clazz.getSimpleName().toLowerCase() + "." + order.getProperty())
-            );
-            orderSpecifiers.add(orderSpecifier);
-        }
+        sortMap.forEach((property, order) -> {
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            OrderSpecifier<? extends Comparable> spec =
+                    new OrderSpecifier<>(order, entityPath.getComparable(property, Comparable.class));
+            orderSpecifiers.add(spec);
+        });
 
         return orderSpecifiers;
     }
